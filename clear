@@ -1,0 +1,63 @@
+---
+title: "Untitled"
+runtime: shiny
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(shiny)
+library(shinydashboard)
+library(shinycssloaders)
+library(DT)
+library(dplyr)
+library(formattable)
+
+
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+df <- structure(list(Date = structure(c(1541662915.921, 1541662949.842, 
+1541662949.845, 1541662949.845, 1541662993.957, 1541662915.921, 
+1541662949.842, 1541662949.845, 1541662949.845, 1541662993.957
+), class = c("POSIXct", "POSIXt"), tzone = "UTC"), Date1 = structure(c(17843, 
+17843, 17843, 17843, 17843, 17843, 17843, 17843, 17843, 17843
+), class = "Date"), ID = structure(c(1L, 1L, 1L, 1L, 1L, 
+1L, 1L, 1L, 1L, 2L), .Label = c("AAA", "BBB"), class = "factor"), 
+    Value = c(68, 70175, 71107, 702175, 72638, 7238, 739, 738469, 
+    75901, 7106), Status = structure(c(1L, 1L, 2L, 2L, 1L, 2L, 
+    1L, 1L, 2L, 1L), .Label = c("Approved", "Pending"), class = "factor")), row.names = c(NA, 
+-10L), class = "data.frame")
+
+dateInput("Date", "", min = NA, max = NA, value = NA,format = "yyyy-mm-dd")
+selectInput("Tic","",choices = c("",as.character(df$ID)),selected = "")
+actionButton("Submit","Submit")
+actionButton("Clear","Clear")
+tableOutput("table")
+
+
+     data2 <- eventReactive(input$Submit,{
+      if(input$Tic != "" && !is.null(input$Date)){
+      df1 <- df %>% filter(Date1 %in% input$Date && ID %in% input$Tic)
+      }
+        })
+
+
+output$table <- renderTable({
+  data2()
+})
+
+      observeEvent(input$Clear,{
+      output$table <- renderTable({
+  data2()
+})
+      })
+      
+```
